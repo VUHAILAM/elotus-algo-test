@@ -26,7 +26,7 @@ func NewAccountService(db *gorm.DB, auth *auth.AuthHandler) *Account {
 	}
 }
 
-func (a *Account) GetAccountByUsername(ctx context.Context, username string) (models.Account, error) {
+func (a *Account) getAccountByUsername(ctx context.Context, username string) (models.Account, error) {
 	var acc models.Account
 	err := a.db.WithContext(ctx).Where("username = ?", username).Take(&acc).Error
 	if err != nil {
@@ -41,7 +41,7 @@ func (a *Account) GetAccountByUsername(ctx context.Context, username string) (mo
 }
 
 func (a *Account) Login(ctx context.Context, username string, password string) (string, string, error) {
-	acc, err := a.GetAccountByUsername(ctx, username)
+	acc, err := a.getAccountByUsername(ctx, username)
 	if err != nil {
 		return "", "", err
 	}
@@ -72,7 +72,7 @@ func (a *Account) Login(ctx context.Context, username string, password string) (
 	return accessToken, refreshToken, nil
 }
 
-func (a *Account) Create(ctx context.Context, account *models.Account) error {
+func (a *Account) create(ctx context.Context, account *models.Account) error {
 	err := a.db.WithContext(ctx).Create(account).Error
 	if err != nil {
 		logrus.Error("Create account error", err)
@@ -90,7 +90,7 @@ func (a *Account) Register(ctx context.Context, username string, password string
 		TokenHash: ultils.GenerateRandomString(15),
 	}
 
-	err := a.Create(ctx, &newAcc)
+	err := a.create(ctx, &newAcc)
 	if err != nil {
 		return err
 	}
