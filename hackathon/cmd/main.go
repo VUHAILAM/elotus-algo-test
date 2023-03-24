@@ -43,6 +43,12 @@ func main() {
 	authHandler := auth.NewAuthHandler(authConfig)
 	accountService := account.NewAccountService(db, authHandler)
 
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
 	router.POST("/login", func(ctx *gin.Context) {
 		req := struct {
 			Username string `json:"username"`
