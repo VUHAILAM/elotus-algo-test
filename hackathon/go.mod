@@ -39,6 +39,8 @@ require (
 require (
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang-jwt/jwt/v5 v5.0.0-rc.1
+	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/mitchellh/mapstructure v1.5.0
 	golang.org/x/crypto v0.7.0
 	golang.org/x/sys v0.6.0 // indirect
 	gorm.io/driver/sqlite v1.4.4

@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"hackathon/configs"
 	"hackathon/pkg/account"
 	"hackathon/pkg/auth"
+	"hackathon/pkg/files"
+	"hackathon/pkg/middleware"
+	"hackathon/pkg/models"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -84,6 +89,54 @@ func main() {
 		}
 
 		ctx.JSON(http.StatusOK, nil)
+	})
+
+	imageService := files.NewImageService(db)
+	router.Use(middleware.AuthenizationMiddleware(authHandler)).POST("/upload", func(ctx *gin.Context) {
+		file, err := ctx.FormFile("file")
+		if err != nil {
+			ctx.String(http.StatusBadRequest, "get form err: %s", err.Error())
+			return
+		}
+
+		if file.Size > 8000000 {
+			ctx.String(http.StatusBadRequest, "file larger than 8 MB")
+			return
+		}
+
+		contentType := file.Header.Get("Content-type")
+		fmt.Printf("Content-type: %s", contentType)
+
+		s := strings.Split(contentType, "/")
+
+		if s[0] != "image" {
+			ctx.String(http.StatusBadRequest, "not an image")
+			return
+		}
+
+		acc, ok := ctx.Get(auth.AccountKey)
+		if !ok {
+			logrus.Error("can not get account from context")
+			ctx.String(http.StatusInternalServerError, "can not get account from context")
+		}
+		username := acc.(models.Account).Username
+
+		imageMetadata := models.Image{
+			Username:    username,
+			Name:        file.Filename,
+			ContentType: contentType,
+			Size:        file.Size,
+		}
+
+		if err := ctx.SaveUploadedFile(file, "/tmp"); err != nil {
+			ctx.String(http.StatusBadRequest, "upload file err: %s", err.Error())
+			return
+		}
+
+		if err := imageService.Save(context.Background(), imageMetadata); err != nil {
+			ctx.String(http.StatusInternalServerError, "save image information to database error: %s", err.Error())
+			return
+		}
 	})
 
 	srv := &http.Server{
