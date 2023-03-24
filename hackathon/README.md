@@ -89,3 +89,10 @@ Register -> Login
 Use access token from Login, attach to Bear Authoration in Upload request
 
 I will update unit tests later. My laptop has some issues so I didn't have time. Sorry :(((
+
+I prepared Dockerfile.
+
+Run 
+```
+docker-compose up --build
+```
