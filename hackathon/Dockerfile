@@ -3,7 +3,6 @@ WORKDIR /
 COPY . .
 RUN apk update && apk upgrade
 RUN apk add --no-cache sqlite && apk add --no-cache build-base
-RUN rm -r /tmp && mkdir /tmp
 RUN go mod download
 RUN GOOS=linux go build -o elotus ./cmd/main.go
 

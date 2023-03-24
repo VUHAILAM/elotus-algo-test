@@ -8,7 +8,7 @@ import (
 type AuthConfig struct {
 	AccessHmacSecretKey  string `envconfig:"ACCESS_HMAC_SECRET_KEY" mapstructure:"access_hmac_secret_key"`
 	RefreshHmacSecretKey string `envconfig:"REFRESH_HMAC_SECRET_KEY" mapstructure:"refresh_hmac_secret_key"`
-	JwtExpiration        int    `envconfig:"JWT_EXPRIVATION" mapstructure:"jwt_exprivation" default:"15"`
+	JwtExpiration        int    `envconfig:"JWT_EXPRIVATION" mapstructure:"jwt_exprivation" default:"5"`
 }
 
 func LoadAuthConfig() (*AuthConfig, error) {

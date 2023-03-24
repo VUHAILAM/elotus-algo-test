@@ -34,6 +34,14 @@ func main() {
 		return
 	}
 
+	if db.Migrator().HasTable(&models.Account{}) == false {
+		db.Migrator().CreateTable(&models.Account{})
+	}
+
+	if db.Migrator().HasTable(&models.Image{}) == false {
+		db.Migrator().CreateTable(&models.Image{})
+	}
+
 	authConfig, err := configs.LoadAuthConfig()
 	if err != nil {
 		logrus.Error("Load auth config err", err)
@@ -134,7 +142,7 @@ func main() {
 			Size:        file.Size,
 		}
 
-		if err := ctx.SaveUploadedFile(file, "/tmp"); err != nil {
+		if err := ctx.SaveUploadedFile(file, "tmp"); err != nil {
 			ctx.String(http.StatusBadRequest, "upload file err: %s", err.Error())
 			return
 		}
@@ -143,6 +151,7 @@ func main() {
 			ctx.String(http.StatusInternalServerError, "save image information to database error: %s", err.Error())
 			return
 		}
+
 	})
 
 	srv := &http.Server{
